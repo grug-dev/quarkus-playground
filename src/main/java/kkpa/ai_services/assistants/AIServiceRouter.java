@@ -14,7 +14,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import kkpa.ai_services.general.GeneralAssistant;
 import kkpa.ai_services.general.SemanticAssistantRouter;
-import kkpa.config.DynamicStoreRetrievalAugmentor;
+import kkpa.config.PropertyRetrievalAugmentor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class AIServiceRouter {
   public AIServiceRouter(
       ChatLanguageModel model,
       EmbeddingModel embeddingModel,
-      DynamicStoreRetrievalAugmentor retrievalAugmentor,
+      PropertyRetrievalAugmentor retrievalAugmentor,
       @Named("documentStore") EmbeddingStore<TextSegment> docStore,
       @Named("propertyStore") EmbeddingStore<TextSegment> propertyStore) {
 

@@ -23,15 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class DynamicStoreRetrievalAugmentor implements RetrievalAugmentor {
+public class PropertyRetrievalAugmentor implements RetrievalAugmentor {
 
-  private static final Logger log = LoggerFactory.getLogger(DynamicStoreRetrievalAugmentor.class);
+  private static final Logger log = LoggerFactory.getLogger(PropertyRetrievalAugmentor.class);
 
   @Inject EmbeddingModel embeddingModel;
-
-  @Inject
-  @Named("documentStore")
-  EmbeddingStore<TextSegment> docStore;
 
   @Inject
   @Named("propertyStore")
@@ -64,8 +60,7 @@ public class DynamicStoreRetrievalAugmentor implements RetrievalAugmentor {
     log.info("Augmenting message: {}", question);
 
     // Select the appropriate store based on the question
-    EmbeddingStore<TextSegment> selectedStore = selectStore(question);
-    log.info("Selected store: {}", selectedStore.getClass().getSimpleName());
+    EmbeddingStore<TextSegment> selectedStore = propertyStore;
 
     // Retrieve relevant content from the selected store
     List<TextSegment> relevantSegments = retrieveRelevantContent(question, selectedStore);
@@ -89,7 +84,7 @@ public class DynamicStoreRetrievalAugmentor implements RetrievalAugmentor {
 
   /** Helper method for AugmentationResult to include retrieved contents */
   private List<Content> getRetrievedContents(String question) {
-    EmbeddingStore<TextSegment> selectedStore = selectStore(question);
+    EmbeddingStore<TextSegment> selectedStore = propertyStore;
     List<TextSegment> segments = retrieveRelevantContent(question, selectedStore);
 
     return segments.stream()
@@ -97,45 +92,18 @@ public class DynamicStoreRetrievalAugmentor implements RetrievalAugmentor {
         .collect(Collectors.toList());
   }
 
-  private EmbeddingStore<TextSegment> selectStore(String question) {
-
-    // More sophisticated embedding-based selection
-    Embedding questionEmbedding = embeddingModel.embed(question).content();
-
-    // Compare with store descriptions
-    String docStoreDesc = "Vinta Store Documents";
-    String propertyStoreDesc =
-        "Property listings, Buildings information, real estate data, house information";
-
-    double docSimilarity =
-        calculateSimilarity(questionEmbedding, embeddingModel.embed(docStoreDesc).content());
-
-    double propertySimilarity =
-        calculateSimilarity(questionEmbedding, embeddingModel.embed(propertyStoreDesc).content());
-
-    log.info("Store similarity scores: doc={}, property={}", docSimilarity, propertySimilarity);
-
-    if (propertyStore == null) {
-      return docStore;
-    }
-
-    // Return the store with higher similarity
-    return docSimilarity > propertySimilarity ? docStore : propertyStore;
-  }
-
   private List<TextSegment> retrieveRelevantContent(
       String question, EmbeddingStore<TextSegment> store) {
     try {
+      log.info("Retrieving relevant content for question: {}", question);
       Embedding questionEmbedding = embeddingModel.embed(question).content();
 
       EmbeddingSearchRequest searchRequest =
-          EmbeddingSearchRequest.builder()
-              .queryEmbedding(questionEmbedding)
-              .maxResults(3)
-              .minScore(0.5)
-              .build();
+          EmbeddingSearchRequest.builder().queryEmbedding(questionEmbedding).minScore(0.5).build();
 
       EmbeddingSearchResult<TextSegment> searchResult = store.search(searchRequest);
+
+      log.info("Retrieved {} relevant content segments", searchResult.matches().size());
 
       return searchResult.matches().stream()
           .map(EmbeddingMatch::embedded)
@@ -164,22 +132,5 @@ public class DynamicStoreRetrievalAugmentor implements RetrievalAugmentor {
     }
 
     return context.toString();
-  }
-
-  private double calculateSimilarity(Embedding e1, Embedding e2) {
-    List<Float> v1 = e1.vectorAsList();
-    List<Float> v2 = e2.vectorAsList();
-
-    double dotProduct = 0.0;
-    double norm1 = 0.0;
-    double norm2 = 0.0;
-
-    for (int i = 0; i < v1.size(); i++) {
-      dotProduct += v1.get(i) * v2.get(i);
-      norm1 += v1.get(i) * v1.get(i);
-      norm2 += v2.get(i) * v2.get(i);
-    }
-
-    return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
   }
 }
