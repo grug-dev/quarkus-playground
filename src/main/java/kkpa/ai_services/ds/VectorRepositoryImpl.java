@@ -67,6 +67,7 @@ public class VectorRepositoryImpl implements VectorRepository {
    * record in the database
    */
   public CompletableFuture<Void> storeEmbeddings(List<BuildingEmbedding> embeddings) {
+    deleteAllEmbeddings();
     return CompletableFuture.runAsync(
         () -> {
           String query =
@@ -135,5 +136,129 @@ public class VectorRepositoryImpl implements VectorRepository {
     }
     sb.append("]");
     return sb.toString();
+  }
+
+  /**
+   * Cleans the entire props_embeddings table, removing all stored embeddings. This is useful before
+   * repopulating the table with fresh data.
+   *
+   * @return A CompletableFuture that completes when the operation is done
+   */
+  public CompletableFuture<Void> cleanEmbeddingsTable() {
+    return CompletableFuture.runAsync(
+        () -> {
+          String truncateQuery = "TRUNCATE TABLE rag_store.props_embeddings";
+
+          try (Connection conn = dataSource.getConnection();
+              PreparedStatement stmt = conn.prepareStatement(truncateQuery)) {
+
+            // Execute the truncate statement
+            stmt.executeUpdate();
+
+            logger.info("Successfully cleaned props_embeddings table");
+          } catch (SQLException e) {
+            logger.error("Error cleaning props_embeddings table", e);
+            throw new RuntimeException("Error cleaning props_embeddings table", e);
+          }
+        });
+  }
+
+  /**
+   * Alternative implementation that uses DELETE instead of TRUNCATE. This might be preferable if
+   * you need to maintain transaction integrity or if TRUNCATE permissions are restricted.
+   *
+   * @return A CompletableFuture that completes when the operation is done
+   */
+  public CompletableFuture<Void> deleteAllEmbeddings() {
+    return CompletableFuture.runAsync(
+        () -> {
+          String deleteQuery = "DELETE FROM rag_store.props_embeddings";
+
+          try (Connection conn = dataSource.getConnection();
+              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+
+            // Execute the delete statement
+            int deletedRows = stmt.executeUpdate();
+
+            logger.info("Successfully deleted {} rows from props_embeddings table", deletedRows);
+          } catch (SQLException e) {
+            logger.error("Error deleting data from props_embeddings table", e);
+            throw new RuntimeException("Error deleting data from props_embeddings table", e);
+          }
+        });
+  }
+
+  /**
+   * Deletes embeddings for specific building IDs. This is useful when you want to update only
+   * certain buildings.
+   *
+   * @param buildingIds An array of building IDs to delete
+   * @return A CompletableFuture that completes when the operation is done
+   */
+  public CompletableFuture<Void> deleteEmbeddingsByBuildingIds(long[] buildingIds) {
+    return CompletableFuture.runAsync(
+        () -> {
+          if (buildingIds == null || buildingIds.length == 0) {
+            logger.warn("No building IDs provided for deletion");
+            return;
+          }
+
+          StringBuilder placeholders = new StringBuilder();
+          for (int i = 0; i < buildingIds.length; i++) {
+            if (i > 0) {
+              placeholders.append(",");
+            }
+            placeholders.append("?");
+          }
+
+          String deleteQuery =
+              "DELETE FROM rag_store.props_embeddings WHERE building_id IN (" + placeholders + ")";
+
+          try (Connection conn = dataSource.getConnection();
+              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+
+            // Set the building IDs as parameters
+            for (int i = 0; i < buildingIds.length; i++) {
+              stmt.setLong(i + 1, buildingIds[i]);
+            }
+
+            // Execute the delete statement
+            int deletedRows = stmt.executeUpdate();
+
+            logger.info(
+                "Successfully deleted {} rows for {} building IDs",
+                deletedRows,
+                buildingIds.length);
+          } catch (SQLException e) {
+            logger.error("Error deleting embeddings for specific building IDs", e);
+            throw new RuntimeException("Error deleting embeddings for specific building IDs", e);
+          }
+        });
+  }
+
+  /**
+   * Resets the auto-increment sequence for the table if it has one. Call this after truncating if
+   * you want IDs to start from 1 again.
+   *
+   * <p>Note: Only needed if your table has an auto-increment primary key. Based on your schema, if
+   * building_id is not auto-generated, this isn't needed.
+   */
+  public CompletableFuture<Void> resetSequence() {
+    return CompletableFuture.runAsync(
+        () -> {
+          String resetQuery = "ALTER SEQUENCE rag_store.props_embeddings_id_seq RESTART WITH 1";
+
+          try (Connection conn = dataSource.getConnection();
+              PreparedStatement stmt = conn.prepareStatement(resetQuery)) {
+
+            // Execute the reset sequence statement
+            stmt.executeUpdate();
+
+            logger.info("Successfully reset sequence for props_embeddings table");
+          } catch (SQLException e) {
+            // This might fail if there's no sequence
+            logger.warn("Could not reset sequence - it may not exist: {}", e.getMessage());
+          }
+        });
   }
 }

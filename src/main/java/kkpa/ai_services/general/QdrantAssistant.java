@@ -54,7 +54,7 @@ public class QdrantAssistant {
     userMessage = userMessage.replaceAll("qdrant", "");
     log.info("QdrantAssistant Assistant Chat with user message: " + userMessage);
     try {
-      AssistantResponse result = assistant.assistantResponse(userMessage);
+      AssistantResponse result = assistant.chat(userMessage);
       if (result == null || result.response().isEmpty() || result.equals("{}")) {
         return "I don't have enough information to answer that question properly.";
       }

@@ -103,7 +103,7 @@ public class DynamicStoreRetrievalAugmentor implements RetrievalAugmentor {
     Embedding questionEmbedding = embeddingModel.embed(question).content();
 
     // Compare with store descriptions
-    String docStoreDesc = "PDF documents, reports, articles, documentation";
+    String docStoreDesc = "Vinta Store Documents";
     String propertyStoreDesc =
         "Property listings, Buildings information, real estate data, house information";
 
