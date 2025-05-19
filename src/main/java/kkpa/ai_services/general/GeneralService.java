@@ -8,12 +8,14 @@ import jakarta.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import kkpa.ai_services.assistants.AIServiceRouter;
-import org.jboss.logging.Logger;
+import kkpa.ai_services.assistants.PropertyAIResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class GeneralService {
 
-  private static final Logger log = Logger.getLogger(GeneralService.class);
+  private static final Logger log = LoggerFactory.getLogger(GeneralService.class);
   private final ChatLanguageModel model;
   private final StreamingChatLanguageModel streamingModel;
   private final AIServiceRouter aiServiceRouter;
@@ -96,6 +98,10 @@ public class GeneralService {
           return "I don't have enough information to answer that question properly.";
         }
         return aiResponse.response();
+      }
+      if (result instanceof PropertyAIResponse aiResponse) {
+        log.info("AI Response: {}", aiResponse);
+        return aiResponse.explanation();
       }
 
       return result.toString();
