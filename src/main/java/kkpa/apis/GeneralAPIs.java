@@ -11,8 +11,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import kkpa.ai_services.general.GeneralService;
-import kkpa.ai_services.general.QdrantAssistant;
+import kkpa.application.general.GeneralService;
+import kkpa.application.general.QdrantAssistant;
 import kkpa.config.DocumentIngestor;
 import org.jboss.logging.Logger;
 

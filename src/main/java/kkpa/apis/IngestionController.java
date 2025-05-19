@@ -9,8 +9,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import kkpa.ai_services.general.DataIngestionException;
-import kkpa.ai_services.general.IngestionService;
+import kkpa.application.general.DataIngestionException;
+import kkpa.application.general.IngestionService;
 import org.jboss.logging.Logger;
 
 @Path("/api/ingestion")

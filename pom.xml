@@ -146,6 +146,14 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jackson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-jackson</artifactId>
+    </dependency>
 
     <!-- For JDBC access to PostgreSQL -->
     <dependency>
