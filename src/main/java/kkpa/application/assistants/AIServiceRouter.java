@@ -15,6 +15,7 @@ import jakarta.inject.Named;
 import kkpa.application.general.GeneralAssistant;
 import kkpa.application.general.SemanticAssistantRouter;
 import kkpa.config.PropertyRetrievalAugmentor;
+import kkpa.tools.PropertyTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +31,17 @@ public class AIServiceRouter {
 
   private final SemanticAssistantRouter semanticAssistantRouter;
 
+  private final PropertyTools propertyTools;
+
   @Inject
   public AIServiceRouter(
       ChatLanguageModel model,
       EmbeddingModel embeddingModel,
       PropertyRetrievalAugmentor retrievalAugmentor,
       @Named("documentStore") EmbeddingStore<TextSegment> docStore,
-      @Named("propertyStore") EmbeddingStore<TextSegment> propertyStore) {
-
+      @Named("propertyStore") EmbeddingStore<TextSegment> propertyStore,
+      PropertyTools propertyTools) {
+    this.propertyTools = propertyTools;
     this.embeddingModel = embeddingModel;
 
     // Create document assistant with document-specific instructions
@@ -65,6 +69,7 @@ public class AIServiceRouter {
             .chatLanguageModel(model)
             .chatMemory(propertyChatMemory)
             .retrievalAugmentor(retrievalAugmentor)
+            .tools(propertyTools)
             .build();
 
     this.generalAssistant =

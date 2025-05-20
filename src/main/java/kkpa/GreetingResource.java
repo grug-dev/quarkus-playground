@@ -6,25 +6,16 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import kkpa.infrastructure.legacy.auth.Credentials;
-import kkpa.infrastructure.legacy.auth.OAuthService;
+import kkpa.infrastructure.legacy.account.AccountLegacyService;
 
 @Path("/hello")
 public class GreetingResource {
 
-  private final OAuthService oauthService;
+  private final AccountLegacyService accountLegacyService;
 
   @Inject
-  public GreetingResource(OAuthService oauthService) {
-    this.oauthService = oauthService;
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  public String hello() {
-    System.out.println(
-        "Token " + oauthService.getToken(new Credentials("panne@mangoreix.com", "Password321")));
-    return "Hello from Quarkus REST";
+  public GreetingResource(AccountLegacyService accountLegacyService) {
+    this.accountLegacyService = accountLegacyService;
   }
 
   @GET

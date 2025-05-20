@@ -1,0 +1,90 @@
+package kkpa.tools;
+
+import dev.langchain4j.agent.tool.Tool;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.math.BigDecimal;
+import java.util.List;
+import kkpa.infrastructure.legacy.transaction.TransactionDto;
+import kkpa.infrastructure.legacy.transaction.TransactionLegacyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/** Tools for retrieving property-related information */
+@ApplicationScoped
+public class PropertyTools {
+
+  private static final Logger log = LoggerFactory.getLogger(PropertyTools.class);
+  private final TransactionLegacyService transactionService;
+
+  @Inject
+  public PropertyTools(TransactionLegacyService transactionService) {
+    this.transactionService = transactionService;
+  }
+
+  /** Gets transactions for a specific building ID */
+  @Tool(
+      """
+  Retrieves real estate transactions for a specific building ID or property ID.
+  Use this when the user asks about transactions, history of sales, purchases,
+  or financial activities related to a specific building or specific property.
+  Building or property are the same thing in this context.
+  """)
+  public String getTransactionsForBuilding(Long buildingId) {
+    try {
+      log.info("Tool called: getTransactionsForBuilding with ID: {}", buildingId);
+
+      List<TransactionDto> transactions =
+          transactionService.getTransactionsByBuildingId(buildingId);
+
+      if (transactions.isEmpty()) {
+        return "No transactions found for building ID " + buildingId;
+      }
+
+      // Format transactions in a way the LLM can easily understand
+      StringBuilder sb = new StringBuilder();
+      sb.append("Found ")
+          .append(transactions.size())
+          .append(" transactions for building ID ")
+          .append(buildingId)
+          .append(":\n\n");
+
+      for (TransactionDto tx : transactions) {
+        sb.append("- Transaction ID: ")
+            .append(tx.id())
+            .append(", Type: ")
+            .append(tx.transactionType())
+            .append(", Amount: ")
+            .append(formatCurrency(tx.amount(), tx.currency()))
+            .append(", Date: ")
+            .append(tx.transactionDate())
+            .append(", Status: ")
+            .append(tx.status());
+
+        if (tx.description() != null && !tx.description().isEmpty()) {
+          sb.append(", Description: ").append(tx.description());
+        }
+
+        sb.append("\n");
+      }
+
+      return sb.toString();
+    } catch (Exception e) {
+      log.error("Error in getTransactionsForBuilding tool", e);
+      return "Error retrieving transactions: " + e.getMessage();
+    }
+  }
+
+  /** Helper method to format currency values */
+  private String formatCurrency(BigDecimal amount, String currencyCode) {
+    if (amount == null) {
+      return "N/A";
+    }
+
+    if ("BRL".equalsIgnoreCase(currencyCode)) {
+      return "R$ " + amount.toString();
+    } else {
+      return amount.toString() + " " + currencyCode;
+    }
+  }
+}

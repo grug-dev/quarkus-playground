@@ -88,14 +88,15 @@ public class OAuthService {
       // Make the token request
       TokenResponseDto dto = oauthClient.getToken(authHeader, formData);
 
+      if (dto == null) {
+        throw new RuntimeException("No token response received");
+      }
+
+      Log.info("Token was received! ");
+
       // Convert and return the token response
       return new TokenResponse(
-          dto.access_token(),
-          dto.token_type(),
-          dto.refresh_token(),
-          dto.expires_in(),
-          dto.scope(),
-          Instant.now());
+          dto.access_token(), dto.refresh_token(), dto.expires_in(), Instant.now());
     } catch (Exception e) {
       Log.error("Failed to get token", e);
       throw new RuntimeException("Authentication failed", e);

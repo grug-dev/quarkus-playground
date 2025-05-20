@@ -35,7 +35,8 @@ public class BuildingRepositoryImpl implements BuildingRepository {
           String query =
               """
                 select b.id, b.buildingtype_id, b_type.name::json->'en' as building_type
-                , b.city_id, c.name::json->'en' as city_name, cs.name::json->'en' as state
+                , b.city_id, c.name::json->'en' as city_name, cs.name::json->'en' as state,
+                b.latitude, b.longitude
                 from public.building b
                 left join buildingtype b_type on b.buildingtype_id = b_type.id
                 left join city c on b.city_id = c.id

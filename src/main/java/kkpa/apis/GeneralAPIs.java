@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -14,6 +15,10 @@ import java.time.format.DateTimeFormatter;
 import kkpa.application.general.GeneralService;
 import kkpa.application.general.QdrantAssistant;
 import kkpa.config.DocumentIngestor;
+import kkpa.infrastructure.legacy.auth.Credentials;
+import kkpa.infrastructure.legacy.auth.OAuthService;
+import kkpa.infrastructure.legacy.auth.RequestScopedTokenHolder;
+import kkpa.infrastructure.legacy.auth.TokenResponse;
 import org.jboss.logging.Logger;
 
 @Path("/api/general/")
@@ -25,15 +30,21 @@ public class GeneralAPIs {
   private final GeneralService generalService;
   private final DocumentIngestor documentIngestor;
   private final QdrantAssistant qdrantAssistant;
+  private final RequestScopedTokenHolder tokenHolder;
+  private final OAuthService oauthService;
 
   @Inject
   public GeneralAPIs(
       GeneralService generalService,
       DocumentIngestor documentIngestor,
-      QdrantAssistant qdrantAssistant) {
+      QdrantAssistant qdrantAssistant,
+      RequestScopedTokenHolder tokenHolder,
+      OAuthService oauthService) {
     this.documentIngestor = documentIngestor;
     this.generalService = generalService;
     this.qdrantAssistant = qdrantAssistant;
+    this.tokenHolder = tokenHolder;
+    this.oauthService = oauthService;
   }
 
   @GET
@@ -60,12 +71,23 @@ public class GeneralAPIs {
   }
 
   @POST
-  @Path("/java/dev/bot")
+  @Path("/dev/bot")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-  public String processMessage(@FormParam("message") String userMsg) {
-    log.info("Java Developer Chat Question: " + userMsg);
+  public String processMessage(
+      @FormParam("message") String userMsg, @HeaderParam("Authorization") String authHeader) {
+    log.info(" Chat Question: " + userMsg);
     // Get AI response from your service
     String aiResponse = null;
+
+    // Extract and store token (optional here since the filter should do this)
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      String token = authHeader.substring(7).trim();
+      tokenHolder.setAccessToken(token);
+    } else {
+      TokenResponse tokenResponse =
+          oauthService.getToken(new Credentials("researcher@gmail.com", "Password123"));
+      tokenHolder.setAccessToken(tokenResponse.accessToken());
+    }
 
     if (userMsg.contains("qdrant")) {
       log.info("Qdrant Assistant Chat with user message: " + userMsg);
