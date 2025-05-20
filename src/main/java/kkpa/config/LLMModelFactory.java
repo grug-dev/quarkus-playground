@@ -29,7 +29,7 @@ public class LLMModelFactory {
   @ConfigProperty(name = "ollama.timeout.minutes", defaultValue = "5")
   int timeoutMinutes;
 
-  @ConfigProperty(name = "ollama.temperature", defaultValue = "0.0")
+  @ConfigProperty(name = "ollama.temperature", defaultValue = "0.1")
   double temperature;
 
   @Produces

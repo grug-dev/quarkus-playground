@@ -24,12 +24,7 @@ public class PropertyTools {
 
   /** Gets transactions for a specific building ID */
   @Tool(
-      """
-  Retrieves real estate transactions for a specific building ID or property ID.
-  Use this when the user asks about transactions, history of sales, purchases,
-  or financial activities related to a specific building or specific property.
-  Building or property are the same thing in this context.
-  """)
+      "IMPORTANT: You MUST use this tool anytime a user asks about transactions, sales history, or financial activities for a specific building. When you see a building ID in a question about transactions, call this tool with that ID. Example: If asked 'Show me transactions for building 500158', call this tool with buildingId=500158.")
   public String getTransactionsForBuilding(Long buildingId) {
     try {
       log.info("Tool called: getTransactionsForBuilding with ID: {}", buildingId);
