@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import kkpa.application.assistants.AIServiceRouter;
 import kkpa.application.assistants.PropertyAIResponse;
+import kkpa.application.assistants.property.formatters.PropertyResponseHtmlFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,9 @@ public class GeneralService {
   private final ChatLanguageModel model;
   private final StreamingChatLanguageModel streamingModel;
   private final AIServiceRouter aiServiceRouter;
+
+  private final PropertyResponseHtmlFormatter propertyResponseHtmlFormatter =
+      new PropertyResponseHtmlFormatter();
 
   // private final ModerationModel moderationModel;
 
@@ -101,7 +105,7 @@ public class GeneralService {
       }
       if (result instanceof PropertyAIResponse aiResponse) {
         log.info("AI Response: {}", aiResponse);
-        return aiResponse.explanation();
+        return propertyResponseHtmlFormatter.formatToHtml(aiResponse);
       }
 
       return result.toString();

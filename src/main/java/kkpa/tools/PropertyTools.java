@@ -1,8 +1,6 @@
 package kkpa.tools;
 
 import dev.langchain4j.agent.tool.Tool;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import java.math.BigDecimal;
 import java.util.List;
 import kkpa.infrastructure.legacy.transaction.TransactionDto;
@@ -11,18 +9,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Tools for retrieving property-related information */
-@ApplicationScoped
 public class PropertyTools {
 
   private static final Logger log = LoggerFactory.getLogger(PropertyTools.class);
   private final TransactionLegacyService transactionService;
 
-  @Inject
+  public PropertyTools() {
+    System.out.println("PropertyTools constructor");
+    this.transactionService = null;
+  }
+
   public PropertyTools(TransactionLegacyService transactionService) {
+    System.out.println("PropertyTools constructor with TransactionLegacyService");
     this.transactionService = transactionService;
   }
 
-  /** Gets transactions for a specific building ID */
   @Tool(
       "IMPORTANT: You MUST use this tool anytime a user asks about transactions, sales history, or financial activities for a specific building. When you see a building ID in a question about transactions, call this tool with that ID. Example: If asked 'Show me transactions for building 500158', call this tool with buildingId=500158.")
   public String getTransactionsForBuilding(Long buildingId) {
@@ -71,7 +72,7 @@ public class PropertyTools {
   }
 
   /** Helper method to format currency values */
-  private String formatCurrency(BigDecimal amount, String currencyCode) {
+  public String formatCurrency(BigDecimal amount, String currencyCode) {
     if (amount == null) {
       return "N/A";
     }

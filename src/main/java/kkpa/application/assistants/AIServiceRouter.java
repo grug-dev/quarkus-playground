@@ -40,8 +40,8 @@ public class AIServiceRouter {
       PropertyRetrievalAugmentor retrievalAugmentor,
       @Named("documentStore") EmbeddingStore<TextSegment> docStore,
       @Named("propertyStore") EmbeddingStore<TextSegment> propertyStore,
-      PropertyTools propertyTools) {
-    this.propertyTools = propertyTools;
+      ToolsFactory toolsFactory) {
+    this.propertyTools = toolsFactory.createPropertyTools();
     this.embeddingModel = embeddingModel;
 
     // Create document assistant with document-specific instructions
@@ -68,7 +68,7 @@ public class AIServiceRouter {
         AiServices.builder(PropertyAssistant.class)
             .chatLanguageModel(model)
             .chatMemory(propertyChatMemory)
-            .retrievalAugmentor(retrievalAugmentor)
+            .contentRetriever(propertyRetriever)
             .tools(propertyTools)
             .build();
 
