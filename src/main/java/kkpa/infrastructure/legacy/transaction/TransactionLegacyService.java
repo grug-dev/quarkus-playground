@@ -32,7 +32,7 @@ public class TransactionLegacyService {
    * @param buildingId Building ID to fetch transactions for
    * @return List of transactions or empty list if none found
    */
-  public List<TransactionDto> getTransactionsByBuildingId(Long buildingId) {
+  public List<TransactionLegacyResponse> getTransactionsByBuildingId(Long buildingId) {
     try {
       log.debug("Fetching transactions for building ID: {}", buildingId);
 
@@ -45,7 +45,7 @@ public class TransactionLegacyService {
       TransactionApiClient client =
           clientFactory.createClient(
               TransactionApiClient.class, new TokenResponse.Builder().accessToken(token).build());
-      List<TransactionDto> transactions = client.getTransactionsByBuildingId(buildingId);
+      List<TransactionLegacyResponse> transactions = client.getTransactionsByBuildingId(buildingId);
 
       log.debug(
           "Successfully fetched {} transactions for building {}", transactions.size(), buildingId);

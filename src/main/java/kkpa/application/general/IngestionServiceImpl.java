@@ -29,7 +29,7 @@ public class IngestionServiceImpl implements IngestionService {
   }
 
   @Override
-  public CompletionStage<Void> ingestBuildingData() throws DataIngestionException {
+  public CompletionStage<Void> ingestPropertyData() throws DataIngestionException {
     LOG.info("Starting building data ingestion process");
 
     return buildingRepository

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import kkpa.application.assistants.Counts;
 import kkpa.application.assistants.Property;
 import kkpa.application.assistants.PropertyAIResponse;
+import kkpa.infrastructure.legacy.transaction.TransactionLegacyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,11 @@ public class PropertyResponseHtmlFormatter {
       // Handle city counts
       if (response.data().cities() != null && !response.data().cities().isEmpty()) {
         html.append(formatCityCounts(response.data().cities()));
+      }
+
+      // Handle transactions (new section)
+      if (response.data().transactions() != null && !response.data().transactions().isEmpty()) {
+        html.append(formatTransactions(response.data().transactions()));
       }
 
       html.append("</div>");
@@ -161,6 +167,47 @@ public class PropertyResponseHtmlFormatter {
     }
 
     html.append("</ul>");
+    html.append("</div>");
+    return html.toString();
+  }
+
+  /**
+   * Formats a list of transactions into HTML.
+   *
+   * @param transactions The list of transactions to format
+   * @return Formatted HTML string for transactions
+   */
+  private String formatTransactions(java.util.List<TransactionLegacyResponse> transactions) {
+    StringBuilder html = new StringBuilder();
+    html.append("<div class=\"transactions-container\">");
+    html.append("<h3>Transaction History (").append(transactions.size()).append(")</h3>");
+    html.append("<table class=\"transactions-table\">");
+
+    // Table header
+    html.append("<thead>");
+    html.append("<tr>");
+    html.append("<th>ID</th>");
+    html.append("<th>Type</th>");
+    html.append("<th>Amount</th>");
+    html.append("<th>Date</th>");
+
+    html.append("</tr>");
+    html.append("</thead>");
+
+    // Table body
+    html.append("<tbody>");
+    for (TransactionLegacyResponse txn : transactions) {
+      html.append("<tr>");
+      html.append("<td>").append(txn.id()).append("</td>");
+      html.append("<td>").append(txn.type()).append("</td>");
+      html.append("<td>").append(txn.txnAmount()).append("</td>");
+      html.append("<td>").append(txn.txnDate()).append("</td>");
+
+      html.append("</tr>");
+    }
+    html.append("</tbody>");
+
+    html.append("</table>");
     html.append("</div>");
     return html.toString();
   }

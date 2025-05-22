@@ -14,5 +14,6 @@ public interface TransactionApiClient {
   @GET
   @Path("/transaction/transactionsByBuildingId")
   @Produces(MediaType.APPLICATION_JSON)
-  List<TransactionDto> getTransactionsByBuildingId(@QueryParam("buildingId") Long buildingId);
+  List<TransactionLegacyResponse> getTransactionsByBuildingId(
+      @QueryParam("buildingId") Long buildingId);
 }

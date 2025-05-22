@@ -34,7 +34,7 @@ public class IngestionController {
 
     try {
       return ingestionService
-          .ingestBuildingData()
+          .ingestPropertyData()
           .thenApply(unused -> Response.ok().entity("{\"status\": \"success\"}").build())
           .exceptionally(
               throwable -> {

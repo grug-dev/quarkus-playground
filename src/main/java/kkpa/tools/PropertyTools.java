@@ -3,7 +3,7 @@ package kkpa.tools;
 import dev.langchain4j.agent.tool.Tool;
 import java.math.BigDecimal;
 import java.util.List;
-import kkpa.infrastructure.legacy.transaction.TransactionDto;
+import kkpa.infrastructure.legacy.transaction.TransactionLegacyResponse;
 import kkpa.infrastructure.legacy.transaction.TransactionLegacyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +14,7 @@ public class PropertyTools {
   private static final Logger log = LoggerFactory.getLogger(PropertyTools.class);
   private final TransactionLegacyService transactionService;
 
-  public PropertyTools() {
-    System.out.println("PropertyTools constructor");
-    this.transactionService = null;
-  }
-
   public PropertyTools(TransactionLegacyService transactionService) {
-    System.out.println("PropertyTools constructor with TransactionLegacyService");
     this.transactionService = transactionService;
   }
 
@@ -30,7 +24,7 @@ public class PropertyTools {
     try {
       log.info("Tool called: getTransactionsForBuilding with ID: {}", buildingId);
 
-      List<TransactionDto> transactions =
+      List<TransactionLegacyResponse> transactions =
           transactionService.getTransactionsByBuildingId(buildingId);
 
       if (transactions.isEmpty()) {
@@ -45,24 +39,20 @@ public class PropertyTools {
           .append(buildingId)
           .append(":\n\n");
 
-      for (TransactionDto tx : transactions) {
+      for (TransactionLegacyResponse tx : transactions) {
         sb.append("- Transaction ID: ")
             .append(tx.id())
             .append(", Type: ")
-            .append(tx.transactionType())
+            .append(tx.type())
             .append(", Amount: ")
-            .append(formatCurrency(tx.amount(), tx.currency()))
+            .append(tx.txnAmount())
             .append(", Date: ")
-            .append(tx.transactionDate())
-            .append(", Status: ")
-            .append(tx.status());
-
-        if (tx.description() != null && !tx.description().isEmpty()) {
-          sb.append(", Description: ").append(tx.description());
-        }
+            .append(tx.txnDate());
 
         sb.append("\n");
       }
+
+      log.info("Transaction Tool Response {}", sb.toString());
 
       return sb.toString();
     } catch (Exception e) {
@@ -72,13 +62,14 @@ public class PropertyTools {
   }
 
   /** Helper method to format currency values */
+  /** NOT USE this, it fails in runtije because tries to convert to bigdecimal */
   public String formatCurrency(BigDecimal amount, String currencyCode) {
     if (amount == null) {
       return "N/A";
     }
 
     if ("BRL".equalsIgnoreCase(currencyCode)) {
-      return "R$ " + amount.toString();
+      return "USD " + amount.toString();
     } else {
       return amount.toString() + " " + currencyCode;
     }

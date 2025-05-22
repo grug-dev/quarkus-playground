@@ -50,7 +50,6 @@
     }
 
     .message {
-      max-width: 80%;
       padding: 10px 15px;
       border-radius: 18px;
       position: relative;
@@ -175,7 +174,7 @@
     .message.ai-message {
       margin-bottom: 15px;
     }
-    
+
 
     .explanation {
       margin-bottom: 15px;
@@ -243,6 +242,49 @@
     .city-counts li {
       padding: 5px 0;
     }
+
+    /* Transactions Table */
+    .transactions-container {
+      margin-top: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .transactions-container h3 {
+      background-color: #f8f9fa;
+      padding: 0.75rem 1rem;
+      margin: 0;
+      font-size: 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .transactions-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .transactions-table th {
+      background-color: #f1f3f5;
+      font-weight: 600;
+    }
+
+    .transactions-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .transactions-table tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+
   </style>
 </head>
 <body>

@@ -6,12 +6,5 @@ import java.time.LocalDate;
 
 /** Data transfer object for real estate transactions */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record TransactionDto(
-    Long id,
-    Long buildingId,
-    String transactionType,
-    BigDecimal amount,
-    String currency,
-    LocalDate transactionDate,
-    String status,
-    String description) {}
+public record TransactionLegacyResponse(
+    Long id, String type, BigDecimal txnArea, BigDecimal txnAmount, LocalDate txnDate) {}
