@@ -1,4 +1,4 @@
-package kkpa;
+package kkpa.infrastructure.web;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;

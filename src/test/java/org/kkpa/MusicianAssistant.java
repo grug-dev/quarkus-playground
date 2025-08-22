@@ -1,4 +1,4 @@
-package kkpa.musician;
+package org.kkpa;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;

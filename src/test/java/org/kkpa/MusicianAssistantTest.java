@@ -10,8 +10,6 @@ import dev.langchain4j.model.ollama.OllamaChatModel;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-import kkpa.musician.MusicianAssistant;
-import kkpa.musician.MusicianDTO;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
