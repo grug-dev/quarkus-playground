@@ -3,7 +3,7 @@ package kkpa.application.assistants;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.*;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
@@ -12,6 +12,7 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import kkpa.application.assistants.documents.DocumentAssistant;
 import kkpa.application.general.GeneralAssistant;
 import kkpa.application.general.SemanticAssistantRouter;
 import kkpa.config.PropertyRetrievalAugmentor;
@@ -35,7 +36,7 @@ public class AIServiceRouter {
 
   @Inject
   public AIServiceRouter(
-      ChatLanguageModel model,
+      ChatModel model,
       EmbeddingModel embeddingModel,
       PropertyRetrievalAugmentor retrievalAugmentor,
       @Named("documentStore") EmbeddingStore<TextSegment> docStore,
@@ -50,7 +51,7 @@ public class AIServiceRouter {
 
     this.documentAssistant =
         AiServices.builder(DocumentAssistant.class)
-            .chatLanguageModel(model)
+            .chatModel(model)
             .chatMemory(regularChatMemory)
             .build();
 
@@ -66,15 +67,16 @@ public class AIServiceRouter {
 
     this.propertyAssistant =
         AiServices.builder(PropertyAssistant.class)
-            .chatLanguageModel(model)
+            .chatModel(model)
             .chatMemory(propertyChatMemory)
             .contentRetriever(propertyRetriever)
+            .retrievalAugmentor(retrievalAugmentor)
             .tools(propertyTools)
             .build();
 
     this.generalAssistant =
         AiServices.builder(GeneralAssistant.class)
-            .chatLanguageModel(model)
+            .chatModel(model)
             .chatMemory(regularChatMemory)
             .build();
 

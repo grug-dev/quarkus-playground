@@ -5,7 +5,7 @@ package org.kkpa;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.dockerjava.api.model.Image;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import java.io.IOException;
 import java.time.Duration;
@@ -30,7 +30,7 @@ public class MusicianAssistantTest {
     OllamaContainer ollamaContainer = createOllamaContainer();
     ollamaContainer.start();
 
-    ChatLanguageModel model =
+    ChatModel model =
         OllamaChatModel.builder()
             .baseUrl(
                 String.format(

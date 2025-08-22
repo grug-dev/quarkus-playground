@@ -1,7 +1,7 @@
 package kkpa.config;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.request.ResponseFormat;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -35,7 +35,7 @@ public class LLMModelFactory {
   @Produces
   @ApplicationScoped
   @Named("regularChatModel")
-  public ChatLanguageModel createChatLanguageModel() {
+  public ChatModel createChatModel() {
     log.info("Creating a new Ollama Chat Language Model...");
     log.info("ollama.base.url: " + ollamaBaseUrl);
     log.info("ollama.model.name: " + modelName);
@@ -70,7 +70,7 @@ public class LLMModelFactory {
   @Produces
   @ApplicationScoped
   @Named("streamingChatModel")
-  public StreamingChatLanguageModel createStreamingChatLanguageModel() {
+  public StreamingChatModel createStreamingChatModel() {
     log.info("Creating a new Ollama Streaming Chat Language Model...");
     log.info("ollama.base.url: " + ollamaBaseUrl);
     log.info("ollama.model.name: " + modelName);

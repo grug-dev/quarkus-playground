@@ -1,4 +1,4 @@
-package kkpa.application.assistants;
+package kkpa.application.assistants.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

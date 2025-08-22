@@ -1,11 +1,10 @@
 package org.kkpa;
 
-import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -13,10 +12,10 @@ import java.util.List;
 @ApplicationScoped
 public class MusicianAssistant {
 
-  private final ChatLanguageModel model;
+  private final ChatModel model;
 
   @Inject
-  public MusicianAssistant(ChatLanguageModel model) {
+  public MusicianAssistant(ChatModel model) {
     this.model = model;
   }
 
@@ -32,8 +31,8 @@ public class MusicianAssistant {
     UserMessage userMsg = UserMessage.from(String.format("Only list the top 3 albums of %s", name));
     List<ChatMessage> messages = List.of(systemMsg, userMsg);
 
-    Response<AiMessage> albums = model.generate(messages);
-    String topThreeAlbums = albums.content().text();
+    ChatResponse response = model.chat(messages);
+    String topThreeAlbums = response.aiMessage().text();
 
     return new MusicianDTO(name, topThreeAlbums);
   }

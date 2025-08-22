@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot</title>
+  <!-- HTMX Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.9/htmx.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fb;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 40px);
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+      background-color: #6366f1;
+      color: white;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      padding: 10px 15px;
+      border-radius: 18px;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .user-message {
+      background-color: #6366f1;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+
+    .ai-message {
+      background-color: #f0f0f0;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-content {
+      word-break: break-word;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .typing-indicator {
+      display: flex;
+      padding: 10px 15px;
+      background-color: #f0f0f0;
+      border-radius: 18px;
+      align-self: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .typing-indicator span {
+      height: 8px;
+      width: 8px;
+      background-color: #888;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      animation: typing 1s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+      margin-right: 0;
+    }
+
+    @keyframes typing {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .chat-input-container {
+      padding: 15px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: #6366f1;
+    }
+
+    .send-button {
+      margin-left: 10px;
+      padding: 0 20px;
+      background-color: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+
+    .send-button:hover {
+      background-color: #4f46e5;
+    }
+
+    .send-button:disabled {
+      background-color: #c7c7c7;
+      cursor: not-allowed;
+    }
+
+    /* Message Response */
+
+    .message.ai-message {
+      margin-bottom: 15px;
+    }
+
+
+    .explanation {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .structured-data {
+      background-color: white;
+      border-radius: 6px;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .property-card {
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .property-card h3,
+    .properties-container h3,
+    .city-statistics h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .property-details {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .property-details li {
+      padding: 5px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .properties-list {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .property-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+
+    .additional-details {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .city-counts {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .city-counts li {
+      padding: 5px 0;
+    }
+
+    /* Transactions Table */
+    .transactions-container {
+      margin-top: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .transactions-container h3 {
+      background-color: #f8f9fa;
+      padding: 0.75rem 1rem;
+      margin: 0;
+      font-size: 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .transactions-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .transactions-table th {
+      background-color: #f1f3f5;
+      font-weight: 600;
+    }
+
+    .transactions-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .transactions-table tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+
+  </style>
+</head>
+<body>
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>Real State Chatbot</h2>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="message ai-message">
+      <div class="message-content">Hello! How can I help you today?</div>
+      <div class="message-time">Now</div>
+    </div>
+  </div>
+  <form class="chat-input-container" id="chat-form" hx-post="/api/properties-bot/chat" hx-trigger="submit"
+        hx-target="#chat-messages" hx-swap="beforeend" hx-indicator="#typing-indicator">
+    <input type="text" name="message" class="chat-input" placeholder="Type your message..." required>
+    <button type="submit" class="send-button">Send</button>
+  </form>
+
+  <!-- Typing indicator template -->
+  <div id="typing-indicator" class="typing-indicator" style="display:none">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<script>
+  document.body.addEventListener('htmx:beforeRequest', function (event) {
+    // Add user message to chat
+    const message = event.detail.requestConfig.parameters.message;
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message user-message';
+    messageElement.innerHTML = `
+                <div class="message-content">${message}</div>
+                <div class="message-time">${time}</div>
+            `;
+
+    document.getElementById('chat-messages').appendChild(messageElement);
+
+    // Clear input
+    document.querySelector('.chat-input').value = '';
+
+    // Show typing indicator
+    const typingIndicator = document.getElementById('typing-indicator').cloneNode(true);
+    typingIndicator.style.display = 'flex';
+    typingIndicator.id = 'active-typing-indicator';
+    document.getElementById('chat-messages').appendChild(typingIndicator);
+
+    // Scroll to bottom
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  document.body.addEventListener('htmx:afterRequest', function () {
+    // Remove typing indicator
+    const typingIndicator = document.getElementById('active-typing-indicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+
+    // Scroll to bottom
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+</script>
+</body>
+</html>

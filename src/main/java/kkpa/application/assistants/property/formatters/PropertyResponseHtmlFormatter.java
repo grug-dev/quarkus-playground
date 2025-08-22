@@ -2,9 +2,9 @@ package kkpa.application.assistants.property.formatters;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import kkpa.application.assistants.Counts;
-import kkpa.application.assistants.Property;
-import kkpa.application.assistants.PropertyAIResponse;
+import kkpa.application.assistants.model.Counts;
+import kkpa.application.assistants.model.Property;
+import kkpa.application.assistants.model.PropertyAIResponse;
 import kkpa.infrastructure.legacy.transaction.TransactionLegacyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

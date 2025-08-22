@@ -3,7 +3,7 @@ package kkpa.application.general;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
@@ -19,13 +19,12 @@ import org.jboss.logging.Logger;
 public class QdrantAssistant {
   private static final Logger log = Logger.getLogger(QdrantAssistant.class);
   private GeneralAssistant assistant;
-  private final ChatLanguageModel model;
+  private final ChatModel model;
   private final EmbeddingStore<TextSegment> documentStore;
 
   @Inject
   public QdrantAssistant(
-      ChatLanguageModel model,
-      @Named("documentStoreQdrant") EmbeddingStore<TextSegment> documentStore) {
+      ChatModel model, @Named("documentStoreQdrant") EmbeddingStore<TextSegment> documentStore) {
     this.model = model;
     this.documentStore = documentStore;
     createAssistant();
@@ -41,7 +40,7 @@ public class QdrantAssistant {
 
     assistant =
         AiServices.builder(GeneralAssistant.class)
-            .chatLanguageModel(model)
+            .chatModel(model)
             .chatMemory(chatMemory)
             .contentRetriever(contentRetriever)
 

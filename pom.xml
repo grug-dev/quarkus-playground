@@ -22,7 +22,7 @@
     <surefire-plugin.version>3.5.2</surefire-plugin.version>
     <maven.home>${user.home}/m2</maven.home>
 
-    <version.langchain4j>1.0.0-beta1</version.langchain4j>
+    <version.langchain4j>1.2.0</version.langchain4j>
     <version.tinylog>2.7.0</version.tinylog>
     <version.postgresql>42.7.1</version.postgresql>
     <!-- Test -->
@@ -72,12 +72,7 @@
       <artifactId>rest-assured</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>dev.langchain4j</groupId>
-      <artifactId>langchain4j-ollama</artifactId>
-      <version>1.0.0-beta2</version>
-    </dependency>
+    
 
     <dependency>
       <groupId>org.testcontainers</groupId>

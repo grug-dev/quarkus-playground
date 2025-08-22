@@ -1,4 +1,4 @@
-package kkpa.application.assistants;
+package kkpa.application.assistants.documents;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;

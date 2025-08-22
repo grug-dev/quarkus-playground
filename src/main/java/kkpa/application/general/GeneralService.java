@@ -1,14 +1,15 @@
 package kkpa.application.general;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.service.AiServices;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import kkpa.application.assistants.AIServiceRouter;
-import kkpa.application.assistants.PropertyAIResponse;
+import kkpa.application.assistants.PropertyAssistantService;
+import kkpa.application.assistants.model.PropertyAIResponse;
 import kkpa.application.assistants.property.formatters.PropertyResponseHtmlFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,23 +18,25 @@ import org.slf4j.LoggerFactory;
 public class GeneralService {
 
   private static final Logger log = LoggerFactory.getLogger(GeneralService.class);
-  private final ChatLanguageModel model;
-  private final StreamingChatLanguageModel streamingModel;
+  private final ChatModel model;
+  private final StreamingChatModel streamingModel;
   private final AIServiceRouter aiServiceRouter;
 
   private final PropertyResponseHtmlFormatter propertyResponseHtmlFormatter =
       new PropertyResponseHtmlFormatter();
 
-  // private final ModerationModel moderationModel;
+  private final PropertyAssistantService propertyAssistantService;
 
   @Inject
   public GeneralService(
-      ChatLanguageModel model,
-      StreamingChatLanguageModel streamingModel,
-      AIServiceRouter aiServiceRouter) {
+      ChatModel model,
+      StreamingChatModel streamingModel,
+      AIServiceRouter aiServiceRouter,
+      PropertyAssistantService propertyAssistantService) {
     this.model = model;
     this.streamingModel = streamingModel;
     this.aiServiceRouter = aiServiceRouter;
+    this.propertyAssistantService = propertyAssistantService;
 
     // this.moderationModel = moderationModel;
   }
@@ -87,32 +90,47 @@ public class GeneralService {
     }
   }
 
-  public String freeChatWithMemory(String userMessage) {
-    log.info("General Assistant Chat with user message: " + userMessage);
+  public String findAppropiateAssistantBasedOnMessage(String userMessage) {
+    log.info("Finding appropriate assistant based on user message: " + userMessage);
     try {
       Object result = aiServiceRouter.processQuestion(userMessage);
-
-      if (result == null) {
-        return "I don't have enough information to answer that question properly.";
-      }
-
-      if (result instanceof AssistantResponse) {
-        AssistantResponse aiResponse = ((AssistantResponse) result);
-        if (aiResponse.response().isEmpty() || aiResponse.response().equals("{}")) {
-          return "I don't have enough information to answer that question properly.";
-        }
-        return aiResponse.response();
-      }
-      if (result instanceof PropertyAIResponse aiResponse) {
-        log.info("AI Response: {}", aiResponse);
-        return propertyResponseHtmlFormatter.formatToHtml(aiResponse);
-      }
-
-      return result.toString();
+      return transformResults(result);
 
     } catch (Exception e) {
-      log.error("Error in freeDevelopmentChatWithMemory", e);
+      log.error("Error in findAppropiateAssistantBasedOnMessage", e);
       return "I'm not available right now. Please try again later.";
     }
+  }
+
+  public String propertyAssistant(String userMessage) {
+    log.info("Property Assistant Chat with user message: " + userMessage);
+    try {
+      Object result = propertyAssistantService.processQuestion(userMessage);
+      return transformResults(result);
+
+    } catch (Exception e) {
+      log.error("Error in propertyAssistant", e);
+      return "I'm not available right now. Please try again later.";
+    }
+  }
+
+  private String transformResults(Object result) {
+    if (result == null) {
+      return "I don't have enough information to answer that question properly.";
+    }
+
+    if (result instanceof AssistantResponse) {
+      AssistantResponse aiResponse = ((AssistantResponse) result);
+      if (aiResponse.response().isEmpty() || aiResponse.response().equals("{}")) {
+        return "I don't have enough information to answer that question properly.";
+      }
+      return aiResponse.response();
+    }
+    if (result instanceof PropertyAIResponse aiResponse) {
+      log.info("AI Response: {}", aiResponse);
+      return propertyResponseHtmlFormatter.formatToHtml(aiResponse);
+    }
+
+    return result.toString();
   }
 }

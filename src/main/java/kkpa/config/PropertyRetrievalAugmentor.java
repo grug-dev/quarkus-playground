@@ -54,7 +54,6 @@ public class PropertyRetrievalAugmentor implements RetrievalAugmentor {
   }
 
   /** Implementation of the deprecated method (still required in beta1) */
-  @Override
   public UserMessage augment(UserMessage userMessage, Metadata metadata) {
     String question = userMessage.singleText();
     log.info("Augmenting message: {}", question);

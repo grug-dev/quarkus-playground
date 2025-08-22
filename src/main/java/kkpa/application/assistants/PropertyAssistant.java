@@ -2,6 +2,7 @@ package kkpa.application.assistants;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import kkpa.application.assistants.model.PropertyAIResponse;
 
 public interface PropertyAssistant {
 
@@ -24,17 +25,17 @@ public interface PropertyAssistant {
           + "  \"explanation\": \"I found 3 multifamily buildings in our database located in São Paulo, Rio de Janeiro, and Brasília.\",\n"
           + "  \"data\": {\n"
           + "    \"properties\": [\n"
-          + "      { \"id\": \"1238607\", \"type\": \"Multifamily\", \"city\": \"São Paulo\" },\n"
-          + "      { \"id\": \"1238598\", \"type\": \"Multifamily\", \"city\": \"Rio de Janeiro\" },\n"
-          + "      { \"id\": \"1238599\", \"type\": \"Multifamily\", \"city\": \"Brasilia\" }\n"
+          + "      { \"id\": \"100\", \"type\": \"Multifamily\", \"city\": \"São Paulo\" },\n"
+          + "      { \"id\": \"101\", \"type\": \"Multifamily\", \"city\": \"Rio de Janeiro\" },\n"
+          + "      { \"id\": \"102\", \"type\": \"Multifamily\", \"city\": \"Brasilia\" }\n"
           + "    ]\n"
           + "  }\n"
           + "}\n\n"
           + "Example 2 - Single property:\n"
           + "{\n"
-          + "  \"explanation\": \"Here are the details for building ID 1238607. It's a multifamily property located in São Paulo.\",\n"
+          + "  \"explanation\": \"Here are the details for building ID 100. It's a multifamily property located in São Paulo.\",\n"
           + "  \"data\": {\n"
-          + "    \"property\": { \"id\": \"1238607\", \"type\": \"Multifamily\", \"city\": \"São Paulo\" }\n"
+          + "    \"property\": { \"id\": \"100\", \"type\": \"Multifamily\", \"city\": \"São Paulo\" }\n"
           + "  }\n"
           + "}\n\n"
           + "Example 3 - City statistics:\n"
@@ -46,9 +47,9 @@ public interface PropertyAssistant {
           + "}\n\n"
           + "Example 4 - Building transactions:\n"
           + "{\n"
-          + "  \"explanation\": \"I found 3 transactions for building ID 1238607. The most recent transaction was a sale for R$ 5,000,000 on June 15, 2024. There were also two rental agreements in March and April 2024.\",\n"
+          + "  \"explanation\": \"I found 3 transactions for building ID 100. The most recent transaction was a sale for R$ 5,000,000 on June 15, 2024. There were also two rental agreements in March and April 2024.\",\n"
           + "  \"data\": {\n"
-          + "    \"property\": { \"id\": \"1238607\", \"type\": \"Multifamily\", \"city\": \"São Paulo\" },\n"
+          + "    \"property\": { \"id\": \"100\", \"type\": \"Multifamily\", \"city\": \"São Paulo\" },\n"
           + "    \"transactions\": [\n"
           + "      { \"id\": \"789\", \"type\": \"Sale\", \"amount\": \"R$ 5,000,000\", \"date\": \"2024-06-15\" },\n"
           + "      { \"id\": \"456\", \"type\": \"Rental\", \"amount\": \"R$ 15,000\", \"date\": \"2024-04-10\" },\n"
@@ -56,9 +57,10 @@ public interface PropertyAssistant {
           + "    ]\n"
           + "  }\n"
           + "}\n\n"
-          + "CRITICAL INSTRUCTION: When a user asks about transactions for a building ID, you MUST FIRST call the getTransactionsForBuilding tool with that ID number before responding. Never speculate about transactions without calling this tool."
+          + "AVAILABLE TOOLS TO CALL:  "
+          + "1. getTransactionsForBuilding: When a user asks about transactions for a building ID, you MUST FIRST call the getTransactionsForBuilding tool with that ID number before responding. Never speculate about transactions without calling this tool."
           + "\n\n"
-          + "Example 5 - Using the getTransactionsForBuilding tool:\n"
+          + "Example  Using the getTransactionsForBuilding tool:\n"
           + "User question: \"Show me transactions for building 123456\"\n"
           + "Step 1: Call getTransactionsForBuilding(123456)\n"
           + "Tool returns: \"Found 2 transactions for building ID 123456: - Transaction ID: 789, Type: Sale, Amount: R$ 1,500,000, Date: 2024-03-15\"\n"
@@ -72,8 +74,13 @@ public interface PropertyAssistant {
           + "    ]\n"
           + "  }\n"
           + "}\n\n"
+          + "END OF AVAILABLE TOOLS"
           + "If the information isn't in the retrieved content, explain that in the explanation field and return I don't know for the data.\n"
           + "NEVER make up information. Only use retrieved content..\n"
+          + "\n\nIMPORTANT: If you receive property information in the user message context, "
+          + "use that information directly to answer questions about properties. "
+          + "Do not attempt to call any tools for property searches or listings. "
+          + "Tools are ONLY for transactions when specifically requested."
           + "When you need to get transactions for a building, use the getTransactionsForBuilding tool with the building ID.")
   @UserMessage("Here is the customer's question: {{userMessage}}")
   PropertyAIResponse chat(String userMessage);
