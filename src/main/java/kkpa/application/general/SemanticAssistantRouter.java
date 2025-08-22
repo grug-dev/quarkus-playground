@@ -55,6 +55,11 @@ public class SemanticAssistantRouter {
       double bestPropScore =
           propResults.matches().stream().mapToDouble(EmbeddingMatch::score).max().orElse(0.0);
 
+      boolean onlyProps = true;
+      if (onlyProps) {
+        return EAssistantType.PROPERTY;
+      }
+
       log.info("Best match scores - Document: {}, Property: {}", bestDocScore, bestPropScore);
 
       if (bestDocScore < 0.5 && bestPropScore < 0.5) {

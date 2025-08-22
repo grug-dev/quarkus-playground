@@ -11,8 +11,6 @@ public interface PropertyAssistant {
           + "Format prices consistently with the R$ currency symbol. "
           + "Property or Building are the same thing in this context."
           + "\n\n"
-          + "CRITICAL INSTRUCTION: When a user asks about transactions for a building ID, you MUST FIRST call the getTransactionsForBuilding tool with that ID number before responding. Never speculate about transactions without calling this tool."
-          + "\n\n"
           + "For your responses:\n"
           + "1. Include a clear, helpful explanation in the 'explanation' field.\n"
           + "2. When applicable, add structured data about properties in the 'data' field:\n"
@@ -58,6 +56,8 @@ public interface PropertyAssistant {
           + "    ]\n"
           + "  }\n"
           + "}\n\n"
+          + "CRITICAL INSTRUCTION: When a user asks about transactions for a building ID, you MUST FIRST call the getTransactionsForBuilding tool with that ID number before responding. Never speculate about transactions without calling this tool."
+          + "\n\n"
           + "Example 5 - Using the getTransactionsForBuilding tool:\n"
           + "User question: \"Show me transactions for building 123456\"\n"
           + "Step 1: Call getTransactionsForBuilding(123456)\n"
@@ -72,8 +72,8 @@ public interface PropertyAssistant {
           + "    ]\n"
           + "  }\n"
           + "}\n\n"
-          + "If the information isn't in the retrieved content, explain that in the explanation field and return null for the data.\n"
-          + "NEVER make up information. Only use retrieved content or data from tools.\n"
+          + "If the information isn't in the retrieved content, explain that in the explanation field and return I don't know for the data.\n"
+          + "NEVER make up information. Only use retrieved content..\n"
           + "When you need to get transactions for a building, use the getTransactionsForBuilding tool with the building ID.")
   @UserMessage("Here is the customer's question: {{userMessage}}")
   PropertyAIResponse chat(String userMessage);
